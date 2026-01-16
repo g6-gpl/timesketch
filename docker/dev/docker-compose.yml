@@ -1,7 +1,7 @@
 services:
   timesketch:
     container_name: timesketch-dev
-    image: us-docker.pkg.dev/osdfir-registry/timesketch/dev:latest
+    image: timesketch-dev:local
     command: timesketch
     ports:
       - 127.0.0.1:5000:5000

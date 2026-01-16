@@ -7,7 +7,7 @@ if [ "$1" = 'timesketch' ]; then
   pip3 install -e /usr/local/src/timesketch/
 
   # Copy config files
-  mkdir /etc/timesketch
+  mkdir -p /etc/timesketch
   cp /usr/local/src/timesketch/data/timesketch.conf /etc/timesketch/
   cp /usr/local/src/timesketch/data/regex_features.yaml /etc/timesketch/
   cp /usr/local/src/timesketch/data/winevt_features.yaml /etc/timesketch/
@@ -77,6 +77,8 @@ if [ "$1" = 'timesketch' ]; then
 
   # Add Sigma rules
   git clone https://github.com/SigmaHQ/sigma /usr/local/src/sigma
+
+  cd /usr/local/src/timesketch/tools/sigma
   # for each line in sigma_rules.txt execute the command
   for line in $(cat sigma_rules.txt); do
     tsctl import-sigma-rules $line
@@ -85,8 +87,9 @@ if [ "$1" = 'timesketch' ]; then
   # Wrap up things
   echo "Timesketch development server is ready!"
 
-  # Sleep forever to keep the container running
-  sleep infinity
+  # Start gunicorn web server
+  cd /usr/local/src/timesketch
+  exec gunicorn --reload -b 0.0.0.0:5000 --log-file - --timeout 120 timesketch.wsgi:application
 fi
 
 # Run a custom command on container start
